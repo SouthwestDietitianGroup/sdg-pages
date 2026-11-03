@@ -4,11 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>2027 Goal Planning Session | Southwest Dietitian Group</title>
-<meta name="description" content="One 60-minute session with a registered dietitian to map your whole year. Billed to insurance; most patients pay $0.">
+<meta name="description" content="One 60-minute session with a registered dietitian to map your whole year. Booking November 15 through January 15. Billed to insurance; most patients pay $0.">
 <meta property="og:title" content="Start 2027 with a plan, not a resolution">
-<meta property="og:description" content="The 2027 Goal Planning Session with Southwest Dietitian Group. Booking November through January.">
+<meta property="og:description" content="The 2027 Goal Planning Session with Southwest Dietitian Group. Booking now, November 15 through January 15.">
 <meta property="og:image" content="https://go.southwestdietitiangroup.com/assets/sdg-badge.png">
-<link rel="icon" href="/assets/sdg-badge.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon-64.png?v=2">
+<link rel="apple-touch-icon" href="/assets/favicon-180.png?v=2">
 
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -248,6 +249,44 @@ body { background: #F4F4F4; color: #2a1520; }
 .sdg-lp .choice-new { background: #eef0e2; border-color: #dfe3c8; }
 @media (max-width: 760px) { .sdg-lp .choose { grid-template-columns: 1fr; } }
 
+/* Sample plan timeline */
+.sdg-lp .tl { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; position: relative; }
+.sdg-lp .tl::before { content: ""; position: absolute; left: 94px; top: 10px; bottom: 10px; width: 1px; background: var(--sage); }
+.sdg-lp .tl li { display: grid; grid-template-columns: 80px 1fr; gap: 28px; padding: 12px 0; position: relative; }
+.sdg-lp .tl li::after { content: ""; position: absolute; left: 89px; top: 18px; width: 11px; height: 11px; border-radius: 50%; background: var(--paper); border: 2px solid var(--sage); }
+.sdg-lp .tl li.tl-first::after { background: var(--rust); border-color: var(--rust); }
+.sdg-lp .tl-when { font-family: var(--label); text-transform: uppercase; letter-spacing: .12em; font-size: .72rem; font-weight: 600; color: var(--gold); padding-top: 3px; text-align: right; }
+.sdg-lp .tl b { display: block; color: var(--plum); font-size: 1rem; }
+.sdg-lp .tl li.tl-first b { color: var(--rust); }
+.sdg-lp .tl div span { color: var(--ink-soft); font-size: .92rem; }
+.sdg-lp .plan-stall { font-size: .92rem; color: var(--ink); background: var(--white); border-radius: 4px; padding: 12px 14px; }
+.sdg-lp .plan-stall strong { color: var(--rust); }
+/* Logo links and footer */
+.sdg-lp .logo-link { display: inline-block; border-radius: 4px; }
+.sdg-lp .logo-link:focus-visible, .sdg-lp .site-link:focus-visible { outline: 2px solid var(--peach); outline-offset: 4px; }
+.sdg-lp .footer-text { display: grid; gap: 4px; text-align: right; }
+.sdg-lp .site-link { color: var(--peach); font-weight: 700; text-decoration: none; letter-spacing: .02em; }
+.sdg-lp .site-link:hover { text-decoration: underline; }
+/* Bigger Get Started section */
+.sdg-lp .final { padding-block: clamp(72px, 11vw, 132px); }
+.sdg-lp .final-badge { width: 120px; }
+.sdg-lp .final .final-title { font-size: clamp(3rem, 8vw, 5.4rem); max-width: none; }
+.sdg-lp .final-sub { font-family: var(--display); font-style: italic; font-size: clamp(1.6rem, 3.6vw, 2.4rem); color: var(--rust); line-height: 1.2; margin-top: -8px; }
+.sdg-lp .final .choose { max-width: 1000px; gap: 24px; margin-top: 26px; }
+.sdg-lp .final .choice { padding: clamp(26px, 4.5vw, 44px); gap: 18px; }
+.sdg-lp .final .choice h3 { font-size: clamp(1.8rem, 3vw, 2.2rem); }
+.sdg-lp .final .opt { padding: 24px 26px; }
+.sdg-lp .final .opt strong { font-size: 1.3rem; }
+.sdg-lp .final .opt span { font-size: 1rem; }
+.sdg-lp .final .choice .btn { padding: 22px 36px; font-size: .95rem; }
+@media (max-width: 560px) {
+  .sdg-lp .tl::before { left: 74px; }
+  .sdg-lp .tl li { grid-template-columns: 62px 1fr; gap: 26px; }
+  .sdg-lp .tl li::after { left: 69px; }
+  .sdg-lp .footer-text { text-align: left; }
+  .sdg-lp .final .choice .btn { width: 100%; }
+}
+
 @media (max-width: 860px) {
   .sdg-lp .why, .sdg-lp .leave-grid, .sdg-lp .reset-grid, .sdg-lp .faq { grid-template-columns: 1fr; }
   .sdg-lp .steps { grid-template-columns: 1fr 1fr; row-gap: 40px; }
@@ -275,8 +314,8 @@ body { margin: 0; }
   <header class="hero">
     <div class="wrap">
       <div class="hero-top">
-        <img class="hero-logo" src="/assets/sdg-logo-white.png" alt="Southwest Dietitian Group">
-        <p class="eyebrow">Booking November through January</p>
+        <a class="logo-link" href="https://southwestdietitiangroup.com/" target="_blank" rel="noopener"><img class="hero-logo" src="/assets/sdg-logo-white.png" alt="Southwest Dietitian Group home"></a>
+        <p class="eyebrow">Booking now · November 15 through January 15</p>
       </div>
 
       <svg class="sunrise" viewBox="0 0 560 150" aria-hidden="true">
@@ -297,7 +336,7 @@ body { margin: 0; }
         <p class="lede">One 60-minute session with a registered dietitian to map your whole year: what to do first, what to expect, how long it takes, and what to do when things stall.</p>
         <div class="hero-actions">
           <a class="btn btn-peach" href="#sdg-book">Book my session</a>
-          <a class="btn btn-ghost" href="https://form.jotform.com/SouthwestDietitianGroup/verify-my-benefits">New to SDG? Check my benefits</a>
+          <a class="btn btn-ghost" href="https://form.jotform.com/SouthwestDietitianGroup/verify-my-benefits" target="_blank" rel="noopener">New to SDG? Check my benefits</a>
         </div>
         <p class="hero-note">Billed to insurance like a regular visit. <strong>Most of our patients pay $0.</strong></p>
       </div>
@@ -313,8 +352,8 @@ body { margin: 0; }
         <p class="lede">That's what this session gives you. You leave with a written plan built for your body and your life, and your first step already chosen.</p>
       </div>
       <blockquote class="quote">
-        <p>"When a man does not know what harbour he is making for, no wind is the right wind."</p>
-        <cite>Seneca, Moral Letters to Lucilius</cite>
+        <p>"The journey of a thousand miles begins with a single step."</p>
+        <cite>Lao Tzu, Tao Te Ching</cite>
       </blockquote>
     </div>
   </section>
@@ -351,20 +390,21 @@ body { margin: 0; }
           </li>
         </ul>
 
-        <div class="plan" aria-label="Example of a 2027 plan">
+        <div class="plan" aria-label="A sample 2027 plan">
           <div class="plan-head">
-            <h3>My 2027 Plan</h3>
-            <small>Example</small>
+            <h3>A sample 2027 plan</h3>
+            <small>Illustration</small>
           </div>
-          <p class="plan-goal">"I want steady energy and to feel at home in my body again."</p>
-          <p class="plan-label">My pace: walking</p>
-          <div class="phases">
-            <div class="phase first"><b>Phase 1</b><span>14-Day Reset</span><em>2 weeks</em></div>
-            <div class="phase"><b>Phase 2</b><span>Foundation</span><em>4 to 8 weeks</em></div>
-            <div class="phase"><b>Phase 3</b><span>Active change</span><em>12 to 24 weeks</em></div>
-            <div class="phase"><b>Phase 4</b><span>Maintenance</span><em>Ongoing</em></div>
-          </div>
-          <p class="plan-foot">Every plan is built for the person. Your phases and timeline will be your own.</p>
+          <p class="plan-goal">"I want steady energy, better blood sugar, and to feel at home in my body again."</p>
+          <p class="plan-label">Pace: walking · Time to goal: about 12 months</p>
+          <ol class="tl">
+            <li class="tl-first"><span class="tl-when">Jan</span><div><b>Phase 1 · 14-Day Reset</b><span>Win: more energy, less bloating, and a list of foods that work for you</span></div></li>
+            <li><span class="tl-when">Feb to Mar</span><div><b>Phase 2 · Foundation</b><span>Win: steadier blood sugar and fewer afternoon crashes</span></div></li>
+            <li><span class="tl-when">Apr to Sep</span><div><b>Phase 3 · Active change</b><span>Win: about 0.5 to 1 lb a week, with A1C trending down</span></div></li>
+            <li><span class="tl-when">Oct on</span><div><b>Phase 4 · Maintenance</b><span>Win: results that hold without a diet</span></div></li>
+          </ol>
+          <p class="plan-stall"><strong>When things stall:</strong> we check sleep, stress, your cycle, and meal timing before we change the food.</p>
+          <p class="plan-foot">Every plan is built for the person. Yours will have your own phases, timeline, and wins.</p>
         </div>
       </div>
     </div>
@@ -375,10 +415,10 @@ body { margin: 0; }
       <p class="eyebrow">How it works</p>
       <h2>Four steps from booking to your first day.</h2>
       <ol class="steps">
-        <li><span class="when">Today</span><h3>Book your session</h3><p>Pick any time in November, December, or January, by video or in person. New to SDG? We check your benefits first.</p></li>
+        <li><span class="when">Today</span><h3>Book your session</h3><p>Pick any time from November 15 through January 15, by video or in person. New to SDG? We check your benefits first.</p></li>
         <li><span class="when">2 minutes</span><h3>Fill out your prep form</h3><p>New insurance, a new address, your doctor's info, and three questions about what you want from 2027.</p></li>
         <li><span class="when">60 minutes</span><h3>Build your plan</h3><p>You and your dietitian set your goal, choose your pace, and map every phase of your year.</p></li>
-        <li><span class="when">Your choice of day</span><h3>Start your reset</h3><p>Begin your 14-Day Reset whenever you're ready. Your plan-start visit comes in January or February.</p></li>
+        <li><span class="when">Your choice of day</span><h3>Start your reset</h3><p>Begin your 14-Day Reset whenever you're ready, then join our Connection Space community for the support and accountability that keep you going. Your plan-start visit comes in January or February.</p></li>
       </ol>
     </div>
   </section>
@@ -480,19 +520,20 @@ body { margin: 0; }
 
   <section class="band final" id="sdg-book">
     <div class="wrap">
-      <img class="final-badge" src="/assets/sdg-badge.png" alt="">
-      <h2>Your year starts with one hour.</h2>
-      <p class="lede">Sessions are open November through January, while spots last. Choose the option that fits you.</p>
+      <img class="final-badge" src="/assets/sdg-badge.png?v=2" alt="">
+      <h2 class="final-title">Get Started Today</h2>
+      <p class="final-sub">Your year starts with one hour.</p>
+      <p class="lede">Sessions are open November 15 through January 15, while spots last. Choose the option that fits you.</p>
       <div class="choose">
         <div class="choice">
           <p class="eyebrow">Current or past patients</p>
           <h3>Welcome back</h3>
-          <a class="opt opt-main" href="https://sdg.intakeq.com/booking?serviceId=e7643dee-288e-4a89-a744-cc7fc0fdb879">
+          <a class="opt opt-main" href="https://sdg.intakeq.com/booking?serviceId=e7643dee-288e-4a89-a744-cc7fc0fdb879" target="_blank" rel="noopener">
             <span class="opt-tag">Most openings</span>
             <strong>Book by telehealth</strong>
             <span>Meet your dietitian by video, from anywhere.</span>
           </a>
-          <a class="opt" href="https://sdg.intakeq.com/booking?serviceId=b3e5fda4-451b-4edf-a47e-8d6270304902">
+          <a class="opt" href="https://sdg.intakeq.com/booking?serviceId=b3e5fda4-451b-4edf-a47e-8d6270304902" target="_blank" rel="noopener">
             <strong>Book in person</strong>
             <span>Meet at one of our offices.</span>
           </a>
@@ -501,7 +542,7 @@ body { margin: 0; }
           <p class="eyebrow">New to SDG?</p>
           <h3>Welcome! Let's start with your benefits.</h3>
           <p>Tell us about your insurance and we'll check your coverage, then help you book. Most of our patients pay $0.</p>
-          <a class="btn btn-rust" href="https://form.jotform.com/SouthwestDietitianGroup/verify-my-benefits">Check my benefits</a>
+          <a class="btn btn-rust" href="https://form.jotform.com/SouthwestDietitianGroup/verify-my-benefits" target="_blank" rel="noopener">Check my benefits</a>
         </div>
       </div>
     </div>
@@ -509,8 +550,11 @@ body { margin: 0; }
 
   <footer class="footer">
     <div class="wrap">
-      <img src="/assets/sdg-logo-white.png" alt="Southwest Dietitian Group">
-      <span>Registered dietitians in Arizona and Oregon · 60+ five-star Google reviews</span>
+      <a class="logo-link" href="https://southwestdietitiangroup.com/" target="_blank" rel="noopener"><img src="/assets/sdg-logo-white.png" alt="Southwest Dietitian Group home"></a>
+      <div class="footer-text">
+        <a class="site-link" href="https://southwestdietitiangroup.com/" target="_blank" rel="noopener">southwestdietitiangroup.com</a>
+        <span>Registered dietitians in Arizona and Oregon · 60+ five-star Google reviews</span>
+      </div>
     </div>
   </footer>
 
