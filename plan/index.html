@@ -216,7 +216,7 @@ function parse(txt){
  if (mk >= 0) txt = txt.slice(txt.indexOf('\n', mk) + 1);
  const d = {start:'', goal:'', why:'', pace:'', p1:[], steps:[], p3:[], along:'', reset:'', hard:'', before:[], next:'', extra:[]};
  const labels = [
-  [/^your goal\s*:/i,'goal'], [/^(your )?starting point\s*:/i,'start'], [/^why it matters( to you)?\s*:/i,'why'], [/^your pace\s*:/i,'pace'],
+  [/^your goal\s*:/i,'goal'], [/^(your )?starting point\s*:/i,'start'], [/^why it matters( to you)?\s*:/i,'why'], [/^(your |my )?(2027 )?affirmation\s*:/i,'why'], [/^your pace\s*:/i,'pace'],
   [/^your 14[- ]day reset\s*:/i,'reset'], [/^when things (get hard|stall)\s*:/i,'hard'],
   [/^(steps to take )?before your next (visit|appointment)\s*:/i,'before'], [/^your labs\s*:/i,'labs'], [/^your next (visit|appointment)\s*:/i,'next']];
  let sec = null, cur = null;
@@ -259,6 +259,8 @@ function splitTitle(t){ // first sentence becomes the card title
 }
 
 /* ================= RENDER ================= */
+const NEG = /\b(not|no|never|don'?t|stuck|discouraged|tired|exhausted|overwhelmed|anxious|anxiety|ashamed|shame|guilt|guilty|sad|depressed|frustrated|hopeless|fat|lazy|failure|afraid|scared|worried|stressed|hate)\b/i;
+const negFlag = d => !!d.why && NEG.test(d.why);
 const goalFlag = d => !!d.goal && (!/\d/.test(d.goal) || /needs numbers/i.test(d.goal));
 function paginate(){
  const pages = [...document.querySelectorAll('#out .page')];
@@ -304,7 +306,7 @@ function render(){
    <h1>${C.title[0]} <em>${C.title[1]}</em> ${C.title[2]}</h1>
    <p class="who">Prepared for <b>${esc(name)}</b> with Dietitian ${esc(rd)} at Southwest Dietitian Group</p>
    <div class="quote ${goalFlag(d)?'flag':''}"><div class="lab">My goal</div><div class="q goal">${d.goal?nb(unquote(d.goal)):'<span class="empty">Your goal, with numbers</span>'}</div>${d.start?`<div class="startpt"><b>Where I\u2019m starting:</b> ${nb(d.start)}</div>`:''}</div>
-   <div class="quote sage"><div class="lab">Why it matters to me</div><div class="q">${d.why?'“'+nb(unquote(d.why))+'”':'<span class="empty">How you want to feel</span>'}</div></div>
+   <div class="quote sage ${negFlag(d)?'flag':''}"><div class="lab">My 2027 affirmation</div><div class="q">${d.why?nb(unquote(d.why)):'<span class="empty">In 2027, I feel encouraged and motivated.</span>'}</div></div>
    ${road}
    <div class="next"><div><div class="k">Plan-start visit</div><div class="v">${esc(start||'To be scheduled')}</div></div><div><div class="k">My dietitian</div><div class="v">${esc(rd)}</div></div></div>`, 'cover');
   }
@@ -340,7 +342,7 @@ function render(){
     <div class="hr"><span class="dot" style="background:#F2B574"></span><div><b>Obstacle Management.</b> Something gets in the way. Pause, name it, and tell your dietitian. Don’t wait for your next visit.</div></div>
     <div class="hr"><span class="dot" style="background:#ACB574"></span><div><b>Reflect &amp; Course Correct.</b> Together, we look at what happened, adjust what needs adjusting, and you get back to the work.</div></div>
    </div>
-   <div class="along"><p><b>You are not doing this alone.</b> Your dietitian is part of every loop. Send us a portal message any time something gets in the way.${d.hard?' And remember why you started: “'+nb(unquote(d.hard))+'”':''}</p></div>`);
+   <div class="along"><p><b>You are not doing this alone.</b> Your dietitian is part of every loop. Send us a portal message any time something gets in the way.${(d.hard||d.why)?' And come back to your affirmation: “'+nb(unquote(d.hard||d.why))+'”':''}</p></div>`);
   }
   if (m==='community'){
    const c = C.community;
@@ -360,15 +362,17 @@ function render(){
  if (raw){ if(!d.goal)miss.push('Your goal:'); if(!d.p1.length)miss.push('Phase One'); if(!d.steps.length)miss.push('Step 1.'); }
  const w = document.getElementById('warn');
  if (raw && goalFlag(d)) miss.push('__GOAL__');
+ if (raw && negFlag(d)) miss.push('__NEG__');
  const goalMsg = miss.includes('__GOAL__') ? '<b>The goal needs numbers.</b> Add where they are starting and the target, for example: average blood sugar 160 to under 130, weight 182 to 150 lb, by June 2027. Edit the \u201cYour goal:\u201d line above.' : '';
- const rest = miss.filter(x => x !== '__GOAL__');
+ const negMsg = miss.includes('__NEG__') ? '<b>Keep the affirmation positive.</b> Use only the feelings they want, in the present tense, for example: \u201cIn 2027, I feel encouraged and motivated.\u201d Leave out words like stuck, discouraged, or not. Edit the \u201cAffirmation:\u201d line above.' : '';
+ const rest = miss.filter(x => x !== '__GOAL__' && x !== '__NEG__');
  w.className = 'warn' + (miss.length?' show':'');
- w.innerHTML = [goalMsg, rest.length ? 'Heads up: I could not find <b>'+rest.map(esc).join(', ')+'</b> in the draft. Check the headings match Heidi\u2019s format.' : ''].filter(Boolean).join('<br><br>');
+ w.innerHTML = [goalMsg, negMsg, rest.length ? 'Heads up: I could not find <b>'+rest.map(esc).join(', ')+'</b> in the draft. Check the headings match Heidi\u2019s format.' : ''].filter(Boolean).join('<br><br>');
 }
 
 const EXAMPLE = `Your goal: Bring my A1c from 7.8 to under 6.5 and my weight from 182 to 140 pounds by December 2027.
 Starting point: A1c 7.8, average blood sugar 165, weight 182 pounds.
-Why it matters to you: "I want to feel like I'm in control of my health again, not like it's controlling me."
+Affirmation: In 2027, I feel in control of my health, encouraged, and motivated.
 Your pace: You chose to walk this year: steady steps you can keep.
 
 Phase One: Investigation
@@ -389,7 +393,7 @@ Maintenance is a different skill entirely. How long you spend here depends on ho
 Along the way, we will monitor your weight, blood sugar, and labs, and adjust for any obstacles that come up.
 
 Your 14-Day Reset: Starts January 5 and ends January 18. Protein target 100 g a day. Your changes: Greek yogurt and eggs stay in. Supplements: multivitamin with breakfast, probiotic at bedtime.
-When things get hard: "in control of my health again"
+When things get hard: I feel in control of my health, encouraged, and motivated.
 Before your next visit:
 - Get your A1c and lipid panel through your referring doctor before January 20.
 - Pick your reset start day and do your grocery shopping the weekend before.
