@@ -26,6 +26,9 @@ html,body{background:#ece7e3;color:var(--ink);font-family:MU,Arial,sans-serif}
 label{display:block;font-family:JS;font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rust);margin:14px 0 5px}
 input,select,textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);border:1px solid #d7ccc6;border-radius:7px;padding:9px 10px;background:#fff}
 textarea{min-height:340px;resize:vertical;font-size:13px;line-height:1.45}
+textarea.small{min-height:0}
+.needs{border-color:#c0392b!important;box-shadow:0 0 0 2px rgba(192,57,43,.15)}
+.quote.flag{cursor:pointer}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--peach);border-color:var(--peach)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hint{font-size:12px;color:var(--quiet);margin-top:5px;line-height:1.4}
@@ -163,6 +166,13 @@ h3.t{font-family:CG;font-weight:600;font-size:16pt;color:var(--rust);margin:14pt
   <textarea id="draft" spellcheck="true" placeholder="Paste from Heidi, starting at &quot;Your goal:&quot; and ending at &quot;Your next visit:&quot;"></textarea>
   <p class="hint">Edit wording right here. The preview updates as you type. Each "Step 1.", "Step 2." line becomes its own step card.</p>
   <div class="warn" id="warn"></div>
+  <label for="goal">Goal, with numbers</label>
+  <textarea id="goal" class="small" rows="2" placeholder="e.g. Average blood sugar from 165 to under 130 and weight from 182 to 150 lb by June 2027"></textarea>
+  <label for="startpt">Where they are starting</label>
+  <textarea id="startpt" class="small" rows="2" placeholder="e.g. Average blood sugar 165, A1c 7.8, weight 182 lb"></textarea>
+  <label for="aff">2027 affirmation, positive words only</label>
+  <textarea id="aff" class="small" rows="2" placeholder="e.g. In 2027, I feel encouraged and motivated."></textarea>
+  <p class="hint">These fill in from Heidi's draft. Fix them here; your edits win and the rest of the draft stays as is.</p>
 
   <div class="btns">
    <button class="primary" id="dl">Download PDF</button>
@@ -259,6 +269,15 @@ function splitTitle(t){ // first sentence becomes the card title
 }
 
 /* ================= RENDER ================= */
+/* goal / starting point / affirmation boxes: filled from the draft until the RD edits them */
+const FIELDS = {goal:'goal', startpt:'start', aff:'why'};
+function syncFields(d){
+ for (const [id, key] of Object.entries(FIELDS)){
+  const el = document.getElementById(id);
+  if (el.dataset.edited !== '1') el.value = d[key] ? unquote(d[key]) : '';
+ }
+}
+function resetFields(){ Object.keys(FIELDS).forEach(id => { const el = document.getElementById(id); el.dataset.edited = ''; el.value = ''; }); }
 const NEG = /\b(not|no|never|don'?t|stuck|discouraged|tired|exhausted|overwhelmed|anxious|anxiety|ashamed|shame|guilt|guilty|sad|depressed|frustrated|hopeless|fat|lazy|failure|afraid|scared|worried|stressed|hate)\b/i;
 const negFlag = d => !!d.why && NEG.test(d.why);
 const goalFlag = d => !!d.goal && (!/\d/.test(d.goal) || /needs numbers/i.test(d.goal));
@@ -295,6 +314,9 @@ const unquote = s => s.replace(/^["“]|["”]$/g,'');
 
 function render(){
  const C = CONTENT[v('packet')], d = parse(document.getElementById('draft').value);
+ syncFields(d);
+ d.goal = v('goal'); d.start = v('startpt'); d.why = v('aff');
+ ['goal','aff'].forEach(id => document.getElementById(id).classList.toggle('needs', id==='goal' ? goalFlag(d) : negFlag(d)));
  const name = v('pname') || 'Your name', rd = v('rd') || 'your dietitian', start = v('start'), here = +v('here');
  let pages = [], pn = 0;
  const page = (inner, cls='') => { pn++; pages.push(`<section class="page ${cls}"><div class="pb">${inner}</div><div class="foot"><span>${esc(C.footer)}</span><span>${pn}</span></div></section>`); };
@@ -363,8 +385,8 @@ function render(){
  const w = document.getElementById('warn');
  if (raw && goalFlag(d)) miss.push('__GOAL__');
  if (raw && negFlag(d)) miss.push('__NEG__');
- const goalMsg = miss.includes('__GOAL__') ? '<b>The goal needs numbers.</b> Add where they are starting and the target, for example: average blood sugar 160 to under 130, weight 182 to 150 lb, by June 2027. Edit the \u201cYour goal:\u201d line above.' : '';
- const negMsg = miss.includes('__NEG__') ? '<b>Keep the affirmation positive.</b> Use only the feelings they want, in the present tense, for example: \u201cIn 2027, I feel encouraged and motivated.\u201d Leave out words like stuck, discouraged, or not. Edit the \u201cAffirmation:\u201d line above.' : '';
+ const goalMsg = miss.includes('__GOAL__') ? '<b>The goal needs numbers.</b> Add where they are starting and the target, for example: average blood sugar 160 to under 130, weight 182 to 150 lb, by June 2027. Fix it in the <b>Goal, with numbers</b> box below.' : '';
+ const negMsg = miss.includes('__NEG__') ? '<b>Keep the affirmation positive.</b> Use only the feelings they want, in the present tense, for example: \u201cIn 2027, I feel encouraged and motivated.\u201d Leave out words like stuck, discouraged, or not. Fix it in the <b>2027 affirmation</b> box below.' : '';
  const rest = miss.filter(x => x !== '__GOAL__' && x !== '__NEG__');
  w.className = 'warn' + (miss.length?' show':'');
  w.innerHTML = [goalMsg, negMsg, rest.length ? 'Heads up: I could not find <b>'+rest.map(esc).join(', ')+'</b> in the draft. Check the headings match Heidi\u2019s format.' : ''].filter(Boolean).join('<br><br>');
@@ -400,6 +422,9 @@ Before your next visit:
 Your next visit: January 20. We start your plan.`;
 
 ['packet','pname','rd','start','here','draft'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+Object.keys(FIELDS).forEach(id => document.getElementById(id).addEventListener('input', e => { e.target.dataset.edited = e.target.value.trim() ? '1' : ''; render(); }));
+document.getElementById('out').addEventListener('click', e => { const q = e.target.closest('.quote.flag'); if (!q) return;
+ const el = document.getElementById(q.classList.contains('sage') ? 'aff' : 'goal'); el.scrollIntoView({behavior:'smooth', block:'center'}); el.focus(); el.select(); });
 document.getElementById('dl').onclick = () => { const n=v('pname'); const old=document.title; document.title = 'My 2027 Plan' + (n?' - '+n:''); window.print(); setTimeout(()=>document.title=old, 500); };
 /* two-click confirm, no pop-up dialogs */
 function twoClick(id, label, ask, needsAsk, act){
@@ -410,11 +435,11 @@ function twoClick(id, label, ask, needsAsk, act){
  };
 }
 twoClick('clear','Clear','Click again to clear', () => true, () => {
- ['pname','rd','start','draft'].forEach(id=>document.getElementById(id).value=''); document.getElementById('here').value='1'; render(); });
+ ['pname','rd','start','draft'].forEach(id=>document.getElementById(id).value=''); resetFields(); document.getElementById('here').value='1'; render(); });
 twoClick('ex','Load example','Replace your text?', () => v('draft') !== '' && v('draft') !== EXAMPLE.trim(), () => {
  const set = (id,val) => { const el=document.getElementById(id); if(!el.value.trim()) el.value=val; };
  set('pname','Sample'); set('rd','Your RD'); set('start','January 20, 2027');
- document.getElementById('draft').value = EXAMPLE; render();
+ document.getElementById('draft').value = EXAMPLE; resetFields(); render();
  document.getElementById('out').scrollIntoView({behavior:'smooth', block:'start'}); });
 /* scale the letter-size preview to fit beside the sidebar */
 const fit = () => { const m=document.querySelector('.main'), p=document.getElementById('out'); if(!m||!p) return;
