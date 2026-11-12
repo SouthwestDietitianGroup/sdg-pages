@@ -104,7 +104,7 @@ h3.t{font-family:CG;font-weight:600;font-size:16pt;color:var(--rust);margin:14pt
 .comm .ic{width:34pt;height:34pt;border-radius:50%;background:var(--peach);display:grid;place-items:center;font-family:JS;font-weight:600;font-size:13pt;color:var(--plum);padding-top:2pt}
 .comm h4{font-family:CG;font-weight:600;font-size:15pt;color:var(--plum);margin-bottom:2pt}
 .close{text-align:center;margin-top:28pt}
-.close .q{font-family:CG;font-style:italic;font-weight:500;font-size:18pt;color:var(--plum);line-height:1.3}
+.close .q{font-family:CG;font-style:italic;font-weight:500;font-size:16pt;color:var(--plum);line-height:1.35;max-width:5.6in;margin:0 auto;text-wrap:balance}
 .close .s{font-family:JS;font-weight:600;font-size:8pt;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);margin-top:8pt}
 .empty{color:var(--quiet);font-style:italic}
 .intro{font-size:11pt;line-height:1.55}
@@ -207,15 +207,15 @@ const CONTENT = {
    /* item html may use {CS} (Connection Space link), {RD} (dietitian name), {PORTAL} (portal link) */
    items: [
     {h: 'Join Connection Space', html: '<p>Our private community, where your 2027 Workbook, the 14-Day Reset guide, meal plans, and class replays live. You’ll also find community events, meal planning club, patient-only resources, and more. <b>Click here to SIGN UP or LOG IN:</b> {CS}</p><div class="note"><div class="k">Good to know</div><ul><li>After you sign up, we approve your account. This can take up to 48 business hours.</li><li>Connection Space is for active patients and clients, meaning at least one scheduled visit per quarter. We review membership each quarter, and members without a scheduled appointment that quarter are removed.</li></ul></div>'},
-    {h: 'RSVP for the 2027 Kickoff Class', html: '<p>Live on <b>Saturday, January 9</b> or <b>Saturday, January 16, 2027</b>. Both classes are the same, so pick the one that fits your schedule. You\u2019ll find them in Connection Space under <b>Events and Meet Ups</b>.</p><p><b>January 9:</b> <a href="https://sdgprograms.com/events/kickoff-class-with-maya">RSVP here</a> &nbsp;&middot;&nbsp; <b>January 16:</b> <a href="https://sdgprograms.com/events/kickoff-class-with-maya-110064261">RSVP here</a></p><p>Can\u2019t make either? Watch the replay in Connection Space.</p>'},
+    {h: 'RSVP for the 2027 Kickoff Class with Maya', html: '<p>Live on <b>Saturday, January 9</b> or <b>Saturday, January 16, 2027</b>. Both classes are the same, so pick the one that fits your schedule. You\u2019ll find them in Connection Space under <b>Events and Meet Ups</b>.</p><p><b>January 9:</b> <a href="https://sdgprograms.com/events/kickoff-class-with-maya">RSVP here</a> &nbsp;&middot;&nbsp; <b>January 16:</b> <a href="https://sdgprograms.com/events/kickoff-class-with-maya-110064261">RSVP here</a></p><p>Can\u2019t make either? Watch the replay in Connection Space.</p>'},
     {h: 'Get your 2027 resources', html: '<p>Inside Connection Space, go to the <b>Patient Resource Library</b>. The first section is <b>2027 Goal Planning and 14-Day Reset Resources</b>, with your reset guide, daily tracker, suggested meal plans, recipes, grocery list, and 2027 planning pages, all free.</p><p><b>Go straight there:</b> <a href="https://sdgprograms.com/posts/patient-resource-library-2027-goal-planning-and-14-day-reset-resources">2027 Goal Planning and 14-Day Reset Resources</a></p>'},
-    {h: 'Join our mailing list', html: '<p>We send new recipes every Friday morning, plus community news. Join our SDG mailing list, then add us to your contacts so we don’t land in your spam folder. You can unsubscribe at any time.</p><p><b>Sign up here:</b> <a href="https://southwestdietitiangroup.kit.com/">southwestdietitiangroup.kit.com</a></p>'},
+    {h: 'Get new recipes every Friday', html: '<p>Join our SDG mailing list and receive new recipes every Friday morning, plus community news. Be sure to add us to your contacts so we don\u2019t land in your spam folder. You can unsubscribe at any time.</p><p><b>Sign up here:</b> <a href="https://southwestdietitiangroup.kit.com/">southwestdietitiangroup.kit.com</a></p>'},
     {h: 'Stay in touch with {RD} between visits', html: '<p>We know medical portals are no fun, but for now they are how we keep your information safe and follow HIPAA privacy laws. Bookmark the link below to reach the portal any time. You’ll also find it inside your SDG Connection Space.</p><p><b>Patient portal:</b> {PORTAL}</p>'}
    ],
    comingHeading: 'Coming in 2027',
    coming: 'What about the moments in between visits? Real life happens there. You’re at the grocery store and the goal slips your mind. It’s a busy Wednesday night and you don’t know what to make for dinner. Or you just don’t feel motivated. We’re building something special for exactly those moments: a new accountability tool and program to support you between visits. Watch your email and Connection Space for more.'
   },
-  closing: ['Small steps, in the right order, get you there.', 'Your SDG team']
+  closing: ['Every BODY is different, and this is YOUR body\u2019s plan. All you need to do is show up and take the right next step. And when you forget what that step is or feel lost, we\u2019re here to help, every step of the way.', 'Your SDG team']
  }
 };
 
@@ -364,7 +364,7 @@ function render(){
     <div class="hr"><span class="dot" style="background:#F2B574"></span><div><b>Obstacle Management.</b> Something gets in the way. Pause, name it, and tell your dietitian. Don’t wait for your next visit.</div></div>
     <div class="hr"><span class="dot" style="background:#ACB574"></span><div><b>Reflect &amp; Course Correct.</b> Together, we look at what happened, adjust what needs adjusting, and you get back to the work.</div></div>
    </div>
-   <div class="along"><p><b>You are not doing this alone.</b> Your dietitian is part of every loop. Send us a portal message any time something gets in the way.${(d.hard||d.why)?' And come back to your affirmation: “'+nb(unquote(d.hard||d.why))+'”':''}</p></div>`);
+   <div class="along"><p><b>You are not doing this alone.</b> Your dietitian is part of every loop. Send us a portal message any time something gets in the way.</p></div>`);
   }
   if (m==='community'){
    const c = C.community;
@@ -379,6 +379,7 @@ function render(){
  }
  document.getElementById('out').innerHTML = pages.join('');
  paginate();
+ document.querySelectorAll('#out a').forEach(a => { a.target = '_blank'; a.rel = 'noopener'; });
  const miss = [];
  const raw = document.getElementById('draft').value.trim();
  if (raw){ if(!d.goal)miss.push('Your goal:'); if(!d.p1.length)miss.push('Phase One'); if(!d.steps.length)miss.push('Step 1.'); }
