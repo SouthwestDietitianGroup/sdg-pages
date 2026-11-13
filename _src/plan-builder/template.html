@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>SDG Plan Builder</title>
+<style>
+@font-face{font-family:CG;src:url(__CG500__) format('woff2');font-weight:500}
+@font-face{font-family:CG;src:url(__CG600__) format('woff2');font-weight:600}
+@font-face{font-family:CG;src:url(__CG500I__) format('woff2');font-weight:500;font-style:italic}
+@font-face{font-family:JS;src:url(__JS600__) format('woff2');font-weight:600}
+@font-face{font-family:MU;src:url(__MU400__) format('woff2');font-weight:400}
+@font-face{font-family:MU;src:url(__MU700__) format('woff2');font-weight:700}
+:root{--rust:#964527;--sage:#ACB574;--peach:#F2B574;--gold:#A4753D;--plum:#31091C;--off:#F4F4F4;--ink:#2a1520;--quiet:#7a6168;--line:#e6dcd6;--sage-t:#eef0e2;--peach-t:#fdf3e8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#ece7e3;color:var(--ink);font-family:MU,Arial,sans-serif}
+/* ---------- builder UI ---------- */
+.app{display:grid;grid-template-columns:400px 1fr;min-height:100vh}
+.side{background:#fff;border-right:1px solid var(--line);padding:22px 22px 40px;position:sticky;top:0;height:100vh;overflow:auto}
+.side .brand{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.side .brand img{height:30px}
+.side h1{font-family:CG;font-weight:600;font-size:26px;color:var(--plum);margin:10px 0 2px}
+.side .sub{font-size:13px;color:var(--quiet);margin-bottom:16px;line-height:1.45}
+.lock{display:flex;gap:8px;align-items:flex-start;background:var(--sage-t);border:1px solid var(--sage);border-radius:8px;padding:9px 11px;font-size:12px;line-height:1.4;margin-bottom:18px}
+label{display:block;font-family:JS;font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rust);margin:14px 0 5px}
+input,select,textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);border:1px solid #d7ccc6;border-radius:7px;padding:9px 10px;background:#fff}
+textarea{min-height:340px;resize:vertical;font-size:13px;line-height:1.45}
+textarea.small{min-height:0}
+.sup{display:grid;gap:6px}
+label.ck{font-family:MU,Arial,sans-serif;font-weight:400;font-size:13.5px;letter-spacing:0;text-transform:none;color:var(--ink);margin:0;display:flex;gap:8px;align-items:center;cursor:pointer}
+label.ck input{width:auto;accent-color:#964527}
+.needs{border-color:#c0392b!important;box-shadow:0 0 0 2px rgba(192,57,43,.15)}
+.quote.flag{cursor:pointer}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--peach);border-color:var(--peach)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:12px;color:var(--quiet);margin-top:5px;line-height:1.4}
+.btns{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+button{font-family:JS;font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:12px;border-radius:99px;padding:11px 18px;cursor:pointer;border:1.5px solid var(--rust);background:#fff;color:var(--rust)}
+button.primary{background:var(--rust);color:#fff}
+button:hover{filter:brightness(.95)}
+.warn{display:none;background:var(--peach-t);border:1px solid var(--peach);border-radius:8px;padding:9px 11px;font-size:12px;margin-top:12px;line-height:1.4}
+.warn.show{display:block}
+.main{padding:28px 20px 60px;overflow:auto;min-width:0}
+.main .pv{font-family:JS;font-weight:600;letter-spacing:.16em;font-size:11px;color:var(--quiet);text-transform:uppercase;text-align:center;margin-bottom:12px}
+/* ---------- the packet (8.5 x 11) ---------- */
+.packet{width:8.5in;margin:0 auto}
+.page{width:8.5in;height:11in;overflow:hidden;background:#fff;margin:0 auto 22px;box-shadow:0 2px 14px rgba(49,9,28,.12);padding:.7in .75in .8in;position:relative;font-size:10.5pt;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pb{height:100%;overflow:hidden}
+.pb>.phase-h:first-child{margin-top:0}
+.quote.flag{outline:2px dashed #c0392b;outline-offset:3pt}
+.startpt{margin-top:6pt;font-size:10.5pt;color:var(--ink)}
+.q.goal{font-style:normal}
+.page p{margin-bottom:7pt;text-wrap:pretty}
+.foot{position:absolute;left:.75in;right:.75in;bottom:.38in;display:flex;justify-content:space-between;font-family:JS;font-weight:600;font-size:7pt;letter-spacing:.18em;text-transform:uppercase;color:#a08a90}
+.eye{font-family:JS;font-weight:600;font-size:8pt;letter-spacing:.22em;text-transform:uppercase;color:var(--rust);margin-bottom:6pt}
+h2.t{font-family:CG;font-weight:500;font-size:30pt;line-height:1.05;color:var(--plum);margin-bottom:12pt}
+h3.t{font-family:CG;font-weight:600;font-size:16pt;color:var(--rust);margin:14pt 0 5pt}
+.cover-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.55in}
+.cover-top img{height:46px}
+.cover-top .tag{font-family:JS;font-weight:600;font-size:8pt;letter-spacing:.2em;text-transform:uppercase;color:var(--plum);background:var(--peach);padding:6pt 12pt;border-radius:99pt}
+.cover h1{font-family:CG;font-weight:500;font-size:58pt;line-height:.95;color:var(--plum);white-space:nowrap}
+.cover h1 em{font-style:italic;color:var(--rust)}
+.cover .who{margin:12pt 0 26pt;font-size:11.5pt;color:var(--quiet)}
+.cover .who b{color:var(--ink)}
+.quote{border-left:5px solid var(--rust);background:var(--peach-t);padding:14pt 18pt;margin:0 0 14pt;border-radius:0 8pt 8pt 0}
+.quote .lab{font-family:JS;font-weight:600;font-size:7.5pt;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);margin-bottom:4pt}
+.quote .q{font-family:CG;font-weight:500;font-style:italic;font-size:17pt;line-height:1.25;color:var(--plum)}
+.quote.sage{border-color:var(--sage);background:var(--sage-t)}
+.quote.sage .lab{color:#5d6430}
+.pace{display:flex;gap:12pt;align-items:center;margin:18pt 0 6pt}
+.pace .pill{font-family:JS;font-weight:600;letter-spacing:.16em;font-size:8.5pt;text-transform:uppercase;background:var(--plum);color:#fff;padding:7pt 14pt;border-radius:99pt;white-space:nowrap}
+.pace p{margin:0;font-size:10.5pt}
+.road{margin:26pt 0 8pt}
+.road .lab{font-family:JS;font-weight:600;font-size:7.5pt;letter-spacing:.2em;text-transform:uppercase;color:var(--quiet);margin-bottom:28pt}
+.road .bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6pt}
+.road .seg{position:relative;border:1.5px solid var(--line);border-radius:8pt;padding:9pt 10pt 8pt;background:#fff}
+.road .seg .n{font-family:JS;font-weight:600;font-size:7pt;letter-spacing:.2em;text-transform:uppercase;color:var(--quiet)}
+.road .seg .nm{font-family:CG;font-weight:600;font-size:15pt;color:var(--plum);line-height:1.1}
+.road .seg.done{background:var(--sage-t);border-color:var(--sage)}
+.road .seg.now{background:var(--rust);border-color:var(--rust)}
+.road .seg.now .n,.road .seg.now .nm{color:#fff}
+.road .seg.now:before{content:"You are here";position:absolute;top:-17pt;left:10pt;font-family:JS;font-weight:600;font-size:7pt;letter-spacing:.18em;text-transform:uppercase;color:var(--rust)}
+.road .seg.now:after{content:"";position:absolute;top:-6pt;left:16pt;border:5pt solid transparent;border-top-color:var(--rust);border-bottom:0}
+.next{display:flex;gap:10pt;margin-top:22pt}
+.next>div{flex:1;border-top:2px solid var(--peach);padding-top:7pt}
+.next .k{font-family:JS;font-weight:600;font-size:7pt;letter-spacing:.2em;text-transform:uppercase;color:var(--rust)}
+.next .v{font-size:11pt;font-weight:700;color:var(--plum)}
+.phase-h{display:flex;align-items:baseline;gap:10pt;border-bottom:1.5px solid var(--sage);padding-bottom:4pt;margin:16pt 0 8pt;break-after:avoid}
+.phase-h .n{font-family:JS;font-weight:600;font-size:8pt;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);white-space:nowrap}
+.phase-h .nm{font-family:CG;font-weight:600;font-size:21pt;color:var(--plum);line-height:1.1}
+.dots{margin:2pt 0 8pt 0;list-style:none}
+.dots li{position:relative;padding-left:16pt;margin-bottom:4pt;text-wrap:pretty}
+.dots li:before{content:"";position:absolute;left:2pt;top:6.5pt;width:6pt;height:6pt;border-radius:50%;background:var(--peach)}
+.step{display:grid;grid-template-columns:30pt 1fr;gap:10pt;border:1.5px solid var(--line);border-radius:9pt;padding:11pt 13pt 6pt;margin-bottom:8pt;break-inside:avoid}
+.step .num{width:26pt;height:26pt;border-radius:50%;background:var(--rust);color:#fff;font-family:JS;font-weight:600;font-size:12pt;display:grid;place-items:center;line-height:1;padding-top:2pt}
+.step .ttl{font-family:CG;font-weight:600;font-size:14.5pt;line-height:1.2;color:var(--plum);margin-bottom:4pt}
+.along{background:var(--sage-t);border:1.5px solid var(--sage);border-radius:9pt;padding:11pt 14pt 5pt;margin-top:14pt;break-inside:avoid}
+.along b{color:#5d6430}
+.card{border:1.5px solid var(--line);border-radius:9pt;padding:12pt 14pt 6pt;margin-bottom:10pt;break-inside:avoid}
+.card .k{font-family:JS;font-weight:600;font-size:7.5pt;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);margin-bottom:3pt}
+.card.reset{border-color:var(--peach);background:var(--peach-t)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10pt}
+.todo{border:1.5px dashed var(--peach);background:#fffaf3;border-radius:8pt;padding:9pt 12pt;color:#8a5a2b;font-size:9.5pt;margin-bottom:8pt}
+.todo:before{content:"Maya to provide: ";font-weight:700}
+.comm{display:grid;grid-template-columns:34pt 1fr;gap:12pt;padding:12pt 0;border-bottom:1px solid var(--line);break-inside:avoid}
+.comm .ic{width:34pt;height:34pt;border-radius:50%;background:var(--peach);display:grid;place-items:center;font-family:JS;font-weight:600;font-size:13pt;color:var(--plum);padding-top:2pt}
+.comm h4{font-family:CG;font-weight:600;font-size:15pt;color:var(--plum);margin-bottom:2pt}
+.close{text-align:center;margin-top:28pt}
+.close .q{font-family:CG;font-style:italic;font-weight:500;font-size:16pt;color:var(--plum);line-height:1.35;max-width:5.6in;margin:0 auto;text-wrap:balance}
+.close .s{font-family:JS;font-weight:600;font-size:8pt;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);margin-top:8pt}
+.empty{color:var(--quiet);font-style:italic}
+.intro{font-size:11pt;line-height:1.55}
+.comm .note{background:var(--peach-t);border-radius:7pt;padding:7pt 10pt 3pt;margin:2pt 0 6pt;font-size:9.5pt}
+.comm .note .k{font-family:JS;font-weight:600;font-size:7pt;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);margin-bottom:2pt}
+.comm .note ul{list-style:disc;padding-left:14pt}
+.comm .note li{margin-bottom:3pt}
+.coming{margin-top:16pt;background:var(--plum);color:#fff;border-radius:10pt;padding:14pt 18pt 8pt;break-inside:avoid}
+.coming .k{font-family:CG;font-weight:600;font-size:18pt;margin-bottom:4pt;color:var(--peach)}
+.page a{color:var(--rust);text-decoration:underline;text-underline-offset:2px}
+.dots.checks li:before{border-radius:3pt;background:#fff;border:1.5px solid var(--rust);width:8pt;height:8pt;top:4.5pt;left:0}
+.howsvg{margin:14pt auto 10pt;max-width:5.6in}
+.howsvg svg{width:100%;height:auto;display:block}
+.howsvg text{font-family:CG;font-weight:600}
+.how-rows{display:grid;gap:8pt;margin:6pt 0 4pt}
+.how-rows .hr{display:grid;grid-template-columns:12pt 1fr;gap:8pt;align-items:start}
+.how-rows .dot{width:10pt;height:10pt;border-radius:50%;margin-top:4pt}
+/* ---------- print ---------- */
+@page{size:letter;margin:0}
+@media print{
+ html,body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .side,.main .pv{display:none!important}
+ .app{display:block}
+ .main{padding:0;overflow:visible}
+ .packet{width:8.5in;zoom:1!important}
+ .page{box-shadow:none;margin:0;break-after:page}
+ .page:last-child{break-after:auto}
+ .quote.flag{outline:none}
+}
+@media (max-width:1100px){.app{grid-template-columns:340px 1fr}.side{padding:18px 16px 32px}}
+@media (max-width:760px){.app{grid-template-columns:1fr}.side{position:static;height:auto}}
+
+</style>
+</head>
+<body>
+<div class="app">
+ <aside class="side">
+  <div class="brand"><img src="__LOGO__" alt="Southwest Dietitian Group"></div>
+  <h1>Plan Builder</h1>
+  <p class="sub">Paste Heidi's patient-facing draft, check it in the preview, and download the patient's PDF.</p>
+  <div class="lock"><span>&#128274;</span><span>Everything stays in this browser window. Nothing you type is uploaded, saved, or sent anywhere. Close the tab and it is gone.</span></div>
+
+  <label for="packet">Packet</label>
+  <select id="packet">
+   <option value="y2027">2027 Goal Planning Session</option>
+  </select>
+
+  <div class="row2">
+   <div><label for="pname">Patient first name</label><input id="pname" autocomplete="off"></div>
+   <div><label for="rd">Dietitian</label><input id="rd" autocomplete="off"></div>
+  </div>
+  <div class="row2">
+   <div><label for="start">Plan-start visit</label><input id="start" autocomplete="off" placeholder="e.g. Jan 20, 2027"></div>
+   <div><label for="here">You are here</label>
+    <select id="here"><option value="1">Phase One</option><option value="2">Phase Two</option><option value="3">Phase Three</option></select></div>
+  </div>
+
+  <label for="draft">Heidi's patient-facing draft</label>
+  <textarea id="draft" spellcheck="true" placeholder="Paste from Heidi, starting at &quot;Your goal:&quot; and ending at &quot;Your next visit:&quot;"></textarea>
+  <p class="hint">Edit wording right here. The preview updates as you type. Each "Step 1.", "Step 2." line becomes its own step card.</p>
+  <div class="warn" id="warn"></div>
+  <label for="goal">Goal, with numbers</label>
+  <textarea id="goal" class="small" rows="2" placeholder="e.g. Average blood sugar from 165 to under 130 and weight from 182 to 150 lb by June 2027"></textarea>
+  <label for="startpt">Where they are starting</label>
+  <textarea id="startpt" class="small" rows="2" placeholder="e.g. Average blood sugar 165, A1c 7.8, weight 182 lb"></textarea>
+  <label for="aff">2027 affirmation, positive words only</label>
+  <textarea id="aff" class="small" rows="2" placeholder="e.g. In 2027, I feel encouraged and motivated."></textarea>
+  <p class="hint">These fill in from Heidi's draft. Fix them here; your edits win and the rest of the draft stays as is.</p>
+  <label>SDG support for this patient</label>
+  <div class="sup" id="sup">
+   <label class="ck"><input type="checkbox" value="SDG GLP-1 Program"> SDG GLP-1 Program</label>
+   <label class="ck"><input type="checkbox" value="Accountability Program"> Accountability Program</label>
+   <label class="ck"><input type="checkbox" value="Emotional Eating Class"> Emotional Eating Class</label>
+   <label class="ck"><input type="checkbox" value="Events and Connection"> Events and Connection</label>
+   <label class="ck"><input type="checkbox" value="Hormone services with Dr. Reker"> Hormone services with Dr. Reker</label>
+   <label class="ck"><input type="checkbox" value="Functional gut health consult with Taylor"> Functional gut health consult with Taylor</label>
+   <input id="supother" autocomplete="off" placeholder="Other (optional)">
+  </div>
+
+  <div class="btns">
+   <button class="primary" id="dl">Download PDF</button>
+   <button id="clear">Clear</button>
+   <button id="ex">Load example</button>
+  </div>
+  <p class="hint">Download PDF opens your print window. Use Chrome. Set Destination to <b>Save as PDF</b> and Margins to <b>Default</b> or <b>None</b>. Chrome remembers these after the first time.</p>
+ </aside>
+
+ <main class="main">
+  <div class="pv">Live preview &middot; letter size</div>
+  <div class="packet" id="out"></div>
+ </main>
+</div>
+
+<script>
+/* ================= PACKET CONTENT (edit here) =================
+   Each packet is a list of modules. The 2027 packet is first;
+   the long-term New Patient packet will reuse the same modules
+   (cover, plan, details) and swap the community pages. */
+const CONTENT = {
+ y2027: {
+  title: ['My', '2027', 'Plan'],
+  eyebrow: '2027 Goal Planning',
+  footer: 'Southwest Dietitian Group  ·  My 2027 Plan',
+  modules: ['cover', 'plan', 'details', 'obstacles', 'community'],
+  connect: {url: 'https://sdgprograms.com/', short: 'sdgprograms.com', resources: 'https://sdgprograms.com/posts/patient-resource-library-2027-goal-planning-and-14-day-reset-resources'},
+  community: {
+   heading: 'Get connected',
+   intro: 'Welcome to the community at Southwest Dietitian Group, SDG for short. SDG is a heart-centered company. We put people over profits, and we commit deeply to supporting our communities, both in their food needs and in connecting them. Real health changes require a healthy nervous system, and a healthy nervous system is supported through safe, supportive connections. That is what our community is built to offer. We go together, we grow together, and that includes YOU.',
+   lead: 'Here’s what’s available to you now, and what’s on our 2027 roadmap for you.',
+   /* item html may use {CS} (Connection Space link), {RD} (dietitian name), {PORTAL} (portal link) */
+   items: [
+    {h: 'Join Connection Space', html: '<p>Our private community, where your 2027 Workbook, the 14-Day Reset guide, meal plans, and class replays live. You’ll also find community events, meal planning club, patient-only resources, and more. <b>Click here to SIGN UP or LOG IN:</b> {CS}</p><div class="note"><div class="k">Good to know</div><ul><li>After you sign up, we approve your account. This can take up to 48 business hours.</li><li>Connection Space is for active patients and clients, meaning at least one scheduled visit per quarter. We review membership each quarter, and members without a scheduled appointment that quarter are removed.</li></ul></div>'},
+    {h: 'RSVP for the 2027 Kickoff Class with Maya', html: '<p>Live on <b>Saturday, January 9</b> or <b>Saturday, January 16, 2027</b>. Both classes are the same, so pick the one that fits your schedule. You\u2019ll find them in Connection Space under <b>Events and Meet Ups</b>.</p><p><b>January 9:</b> <a href="https://sdgprograms.com/events/kickoff-class-with-maya">RSVP here</a> &nbsp;&middot;&nbsp; <b>January 16:</b> <a href="https://sdgprograms.com/events/kickoff-class-with-maya-110064261">RSVP here</a></p><p>Can\u2019t make either? Watch the replay in Connection Space.</p>'},
+    {h: 'Get your 2027 resources', html: '<p>Inside Connection Space, go to the <b>Patient Resource Library</b>. The first section is <b>2027 Goal Planning and 14-Day Reset Resources</b>, with your reset guide, daily tracker, suggested meal plans, recipes, grocery list, and 2027 planning pages, all free.</p><p><b>Go straight there:</b> <a href="https://sdgprograms.com/posts/patient-resource-library-2027-goal-planning-and-14-day-reset-resources">2027 Goal Planning and 14-Day Reset Resources</a></p>'},
+    {h: 'Get new recipes every Friday', html: '<p>Join our SDG mailing list and receive new recipes every Friday morning, plus community news. Be sure to add us to your contacts so we don\u2019t land in your spam folder. You can unsubscribe at any time.</p><p><b>Sign up here:</b> <a href="https://southwestdietitiangroup.kit.com/">southwestdietitiangroup.kit.com</a></p>'},
+    {h: 'Your patient portal: book, reschedule, and message {RD}', html: '<p>Your patient portal is your home base with SDG. Log in any time to:</p><ul class="dots"><li><b>Schedule, reschedule, or cancel</b> your appointments with {RD}, on your own time.</li><li><b>Message {RD}</b> between visits.</li><li><b>Share documents</b> like labs, food logs, and tracking PDFs.</li><li><b>Update your card on file</b> and your information, and so much more.</li></ul><p>We know medical portals are no fun, but for now they are how we keep your information safe and follow HIPAA privacy laws. Bookmark the link below. You\u2019ll also find it inside your SDG Connection Space.</p><div class="note"><div class="k">Try it today</div><p>Log in, find your next appointment with {RD}, and bookmark the page.</p></div><p><b>Patient portal:</b> {PORTAL}</p>'}
+
+   ],
+   comingHeading: 'Coming in 2027',
+   coming: 'What about the moments in between visits? Real life happens there. You’re at the grocery store and the goal slips your mind. It’s a busy Wednesday night and you don’t know what to make for dinner. Or you just don’t feel motivated. We’re building something special for exactly those moments: a new accountability tool and program to support you between visits. Watch your email and Connection Space for more.'
+  },
+  closing: ['Every BODY is different, and this is YOUR body\u2019s plan. All you need to do is show up and take the right next step. And when you forget what that step is or feel lost, we\u2019re here to help, every step of the way.', 'Your SDG team']
+ }
+};
+
+/* ================= PARSER ================= */
+const clean = s => s.replace(/\*\*/g,'').replace(/^["“”]+|["“”]+$/g,'').replace(/\s+/g,' ').trim();
+function parse(txt){
+ const mk = txt.search(/PATIENT[- ]FACING DRAFT/i);
+ if (mk >= 0) txt = txt.slice(txt.indexOf('\n', mk) + 1);
+ const d = {start:'', goal:'', why:'', pace:'', p1:[], steps:[], p3:[], along:'', reset:'', hard:'', before:[], next:'', extra:[]};
+ const labels = [
+  [/^your goal\s*:/i,'goal'], [/^(your )?starting point\s*:/i,'start'], [/^why it matters( to you)?\s*:/i,'why'], [/^(your |my )?(2027 )?affirmation\s*:/i,'why'], [/^your pace\s*:/i,'pace'],
+  [/^your 14[- ]day reset\s*:/i,'reset'], [/^when things (get hard|stall)\s*:/i,'hard'],
+  [/^(steps to take )?before your next (visit|appointment)\s*:/i,'before'], [/^your labs\s*:/i,'labs'], [/^your next (visit|appointment)\s*:/i,'next']];
+ let sec = null, cur = null;
+ for (let raw of txt.split(/\r?\n/)){
+  let line = clean(raw);
+  if (!line) continue;
+  if (/^phase (one|1)\b/i.test(line)){ sec='p1'; cur=null; continue; }
+  if (/^phase (two|2)\b/i.test(line)){ sec='p2'; cur=null; continue; }
+  if (/^phase (three|3)\b/i.test(line)){ sec='p3'; cur=null; continue; }
+  if (/^along the way\b/i.test(line)){ sec='along'; d.along = line; continue; }
+  let hit = labels.find(([re]) => re.test(line));
+  if (hit){ sec = hit[1]; const rest = line.replace(hit[0],'').trim();
+   if (sec==='labs'){ sec='before'; if(rest) d.before.push('Labs: '+rest); }
+   else if (sec==='before'){ if(rest) d.before.push(rest); }
+   else d[sec] = rest;
+   continue; }
+  const st = line.match(/^step\s*(\d+)\s*[.:)\-]?\s*(.*)$/i);
+  if (st){ sec='p2'; cur={n:st[1], text:st[2]}; d.steps.push(cur); continue; }
+  const bullet = /^[-•*●]\s+/.test(raw.trim());
+  const item = line.replace(/^[-•*●]\s+/,'');
+  if (sec==='p1') d.p1.push({b:bullet, t:item});
+  else if (sec==='p2'){ if (cur) cur.text += ' ' + item; else d.steps.push(cur={n:String(d.steps.length+1), text:item}); }
+  else if (sec==='p3') d.p3.push({b:bullet, t:item});
+  else if (sec==='before') d.before.push(item);
+  else if (sec && typeof d[sec]==='string') d[sec] += ' ' + item;
+  else d.extra.push(item);
+ }
+ return d;
+}
+function splitTitle(t){ // first sentence becomes the card title
+ let depth=0;
+ for (let i=0;i<t.length;i++){
+  const c=t[i]; if(c==='(')depth++; else if(c===')')depth--;
+  else if((c==='.'||c==='!'||c==='?') && depth===0 && (i===t.length-1 || t[i+1]===' ')){
+   if (i>160) break;
+   return [t.slice(0,i+1).trim(), t.slice(i+1).trim()];
+  }
+ }
+ return [t,''];
+}
+
+/* ================= RENDER ================= */
+/* goal / starting point / affirmation boxes: filled from the draft until the RD edits them */
+const FIELDS = {goal:'goal', startpt:'start', aff:'why'};
+function syncFields(d){
+ for (const [id, key] of Object.entries(FIELDS)){
+  const el = document.getElementById(id);
+  if (el.dataset.edited !== '1') el.value = d[key] ? unquote(d[key]) : '';
+ }
+}
+function resetFields(){ Object.keys(FIELDS).forEach(id => { const el = document.getElementById(id); el.dataset.edited = ''; el.value = ''; }); }
+const NEG = /\b(not|no|never|don'?t|stuck|discouraged|tired|exhausted|overwhelmed|anxious|anxiety|ashamed|shame|guilt|guilty|sad|depressed|frustrated|hopeless|fat|lazy|failure|afraid|scared|worried|stressed|hate)\b/i;
+const negFlag = d => !!d.why && NEG.test(d.why);
+const goalFlag = d => !!d.goal && (!/\d/.test(d.goal) || /needs numbers/i.test(d.goal));
+function paginate(){
+ const pages = [...document.querySelectorAll('#out .page')];
+ for (let i = 0; i < pages.length; i++){
+  const pg = pages[i], pb = pg.querySelector('.pb'), carry = [];
+  const over = () => pb.scrollHeight > pb.clientHeight + 1;
+  let split = null;
+  while (over() && pb.children.length > 1){
+   const last = pb.lastElementChild;
+   if (last.tagName === 'UL' && last.children.length > 1){
+    if (!split || split.src !== last){ split = {src:last, el:last.cloneNode(false)}; carry.unshift(split.el); }
+    split.el.prepend(last.lastElementChild); continue;
+   }
+   carry.unshift(last); last.remove();
+  }
+  while (pb.children.length > 1 && pb.lastElementChild.matches('.phase-h,.eye,h2.t,h3.t')){ carry.unshift(pb.lastElementChild); pb.lastElementChild.remove(); }
+  if (carry.length){
+   const np = document.createElement('section'); np.className = 'page cont';
+   np.innerHTML = '<div class="pb"></div>' + pg.querySelector('.foot').outerHTML;
+   carry.forEach(c => np.querySelector('.pb').appendChild(c));
+   pg.after(np); pages.splice(i + 1, 0, np);
+  }
+ }
+ pages.forEach((p, i) => { const f = p.querySelector('.foot span:last-child'); if (f) f.textContent = i + 1; });
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const nb = s => { s = esc(s); const i = s.lastIndexOf(' '); return i>0 && s.length-i<16 ? s.slice(0,i)+'&nbsp;'+s.slice(i+1) : s; };
+const v = id => document.getElementById(id).value.trim();
+const lines = arr => { let h='', ul=[]; const flush=()=>{ if(ul.length){h+='<ul class="dots">'+ul.map(x=>'<li>'+nb(x)+'</li>').join('')+'</ul>'; ul=[];} };
+ arr.forEach(x=>{ if(x.b) ul.push(x.t); else { flush(); h+='<p>'+nb(x.t)+'</p>'; } }); flush(); return h; };
+const unquote = s => s.replace(/^["“]|["”]$/g,'');
+
+function render(){
+ const C = CONTENT[v('packet')], d = parse(document.getElementById('draft').value);
+ syncFields(d);
+ d.goal = v('goal'); d.start = v('startpt'); d.why = v('aff');
+ ['goal','aff'].forEach(id => document.getElementById(id).classList.toggle('needs', id==='goal' ? goalFlag(d) : negFlag(d)));
+ const name = v('pname') || 'Your name', rd = v('rd') || 'your dietitian', start = v('start'), here = +v('here');
+ let pages = [], pn = 0;
+ const page = (inner, cls='') => { pn++; pages.push(`<section class="page ${cls}"><div class="pb">${inner}</div><div class="foot"><span>${esc(C.footer)}</span><span>${pn}</span></div></section>`); };
+ const road = `<div class="road"><div class="lab">Your roadmap</div><div class="bar">${['Investigation','The Work','Maintenance'].map((nm,i)=>`<div class="seg ${i+1<here?'done':''} ${i+1===here?'now':''}"><div class="n">Phase ${i+1}</div><div class="nm">${nm}</div></div>`).join('')}</div></div>`;
+
+ for (const m of C.modules){
+  if (m==='cover'){
+   page(`<div class="cover-top"><img src="__LOGO__" alt="Southwest Dietitian Group"><span class="tag">${esc(C.eyebrow)}</span></div>
+   <h1>${C.title[0]} <em>${C.title[1]}</em> ${C.title[2]}</h1>
+   <p class="who">Prepared for <b>${esc(name)}</b> with Dietitian ${esc(rd)} at Southwest Dietitian Group</p>
+   <div class="quote ${goalFlag(d)?'flag':''}"><div class="lab">My goal</div><div class="q goal">${d.goal?nb(unquote(d.goal)):'<span class="empty">Your goal, with numbers</span>'}</div>${d.start?`<div class="startpt"><b>Where I\u2019m starting:</b> ${nb(d.start)}</div>`:''}</div>
+   <div class="quote sage ${negFlag(d)?'flag':''}"><div class="lab">My 2027 affirmation</div><div class="q">${d.why?nb(unquote(d.why)):'<span class="empty">In 2027, I feel encouraged and motivated.</span>'}</div></div>
+   ${road}
+   <div class="next"><div><div class="k">Plan-start visit</div><div class="v">${esc(start||'To be scheduled')}</div></div><div><div class="k">My dietitian</div><div class="v">${esc(rd)}</div></div></div>`, 'cover');
+  }
+  if (m==='plan'){
+   const steps = d.steps.map(s=>{ const [t,b]=splitTitle(s.text); return `<div class="step"><div class="num">${esc(s.n)}</div><div><div class="ttl">${nb(t)}</div>${b?'<p>'+nb(b)+'</p>':''}</div></div>`; }).join('');
+   page(`<div class="eye">Your order of operations</div><h2 class="t">My plan</h2>
+   <div class="phase-h"><span class="n">Phase 1</span><span class="nm">Investigation</span></div>${d.p1.length?lines(d.p1):'<p class="empty">Phase One from Heidi’s draft will appear here.</p>'}
+   <div class="phase-h"><span class="n">Phase 2</span><span class="nm">The Work</span></div>${steps||'<p class="empty">Each “Step 1.”, “Step 2.” line becomes a step card.</p>'}
+   <div class="phase-h"><span class="n">Phase 3</span><span class="nm">Maintenance</span></div>${d.p3.length?lines(d.p3):'<p class="empty">Phase Three from Heidi’s draft will appear here.</p>'}
+   ${d.along?`<div class="along"><p>${nb(d.along).replace(/^Along the way/i,'<b>Along the way</b>')}</p></div>`:''}`);
+  }
+  if (m==='details'){
+   const csLink = `<a href="${C.connect.url}">${esc(C.connect.short)}</a>`;
+   const todo = [...d.before, '__CS__'].map(x => x==='__CS__'
+     ? `<li><b>Log in or sign up for your SDG Connection Space</b> at ${csLink}</li>` : `<li>${nb(x)}</li>`).join('');
+   const cards = [`<div class="card"><div class="k">Steps to take before your next visit</div><ul class="dots checks">${todo}</ul></div>`];
+   const sup = [...document.querySelectorAll('#sup input[type=checkbox]:checked')].map(x => x.value);
+   if (v('supother')) sup.push(v('supother'));
+   if (sup.length) cards.push(`<div class="card"><div class="k">My SDG support</div><p>Your dietitian recommends adding these to your plan:</p><ul class="dots">${sup.map(x=>'<li><b>'+esc(x)+'</b></li>').join('')}</ul><p>Ask ${esc(v('rd')||'your dietitian')} in the portal or at your next visit to get started.</p></div>`);
+   if (d.reset) cards.push(`<div class="card reset"><div class="k">My 14-Day Reset</div><p>${nb(d.reset)}</p><p>Your reset guide, tracker, meal plans, and recipes are in your <a href="${C.connect.resources}">2027 Goal Planning and 14-Day Reset Resources</a> inside your SDG Connection Space. New to Connection Space? <a href="${C.connect.url}"><b>Click here to LOG IN or SIGN UP</b></a> at ${csLink}.</p></div>`);
+   cards.push(`<div class="card"><div class="k">My next appointment</div><p>${d.next?nb(d.next):esc(start||'To be scheduled')}</p></div>`);
+   page(`<div class="eye">Keep this page handy</div><h2 class="t">Next steps</h2>${cards.join('')}`);
+  }
+  if (m==='obstacles'){
+   page(`<div class="eye">The HOW process</div><h2 class="t">Obstacles are expected in 2027</h2>
+   <p>Every plan hits bumps: a busy week, a holiday, a number that won’t move. That is normal. It does not mean the plan is broken or that you did something wrong. We plan for it with the HOW process.</p>
+   <div class="howsvg"><svg viewBox="0 0 772 320" role="img" aria-label="The HOW process: The Work, Obstacle Management, Reflect and Course Correct, then back to The Work">
+    <defs><marker id="ha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#A4753D"/></marker></defs>
+    <g fill="none" stroke="#A4753D" stroke-width="2"><path d="M526 50H630V198" marker-end="url(#ha)"/><path d="M480 240H300" marker-end="url(#ha)"/><path d="M142 198V50H246" marker-end="url(#ha)"/></g>
+    <rect x="246" y="16" width="280" height="68" rx="12" fill="#964527"/><text x="386" y="60" text-anchor="middle" font-size="30" fill="#fff">The Work</text>
+    <rect x="480" y="202" width="290" height="76" rx="12" fill="#fff" stroke="#F2B574" stroke-width="3"/><text x="625" y="250" text-anchor="middle" font-size="28" fill="#31091C">Obstacle Management</text>
+    <rect x="2" y="202" width="298" height="76" rx="12" fill="#fff" stroke="#ACB574" stroke-width="3"/><text x="151" y="249" text-anchor="middle" font-size="26" fill="#31091C">Reflect &amp; Course Correct</text>
+   </svg></div>
+   <div class="how-rows">
+    <div class="hr"><span class="dot" style="background:#964527"></span><div><b>The Work.</b> You do your steps, one at a time.</div></div>
+    <div class="hr"><span class="dot" style="background:#F2B574"></span><div><b>Obstacle Management.</b> Something gets in the way. Pause, name it, and tell your dietitian. Don’t wait for your next visit.</div></div>
+    <div class="hr"><span class="dot" style="background:#ACB574"></span><div><b>Reflect &amp; Course Correct.</b> Together, we look at what happened, adjust what needs adjusting, and you get back to the work.</div></div>
+   </div>
+   <div class="along"><p><b>You are not doing this alone.</b> Your dietitian is part of every loop. Send us a portal message any time something gets in the way.</p></div>`);
+  }
+  if (m==='community'){
+   const c = C.community;
+   const fill = h => h.replace(/\{CS\}/g, `<a href="${C.connect.url}">${esc(C.connect.short)}</a>`)
+     .replace(/\{PORTAL\}/g, '<a href="https://sdg.intakeq.com/portal">sdg.intakeq.com/portal</a>')
+     .replace(/\{RD\}/g, esc(v('rd') || 'your dietitian'));
+   page(`<div class="eye">Your community</div><h2 class="t">${esc(c.heading)}</h2><p class="intro">${nb(c.intro)}</p><p><b>${esc(c.lead)}</b></p>
+   ${c.items.map((it,i)=>`<div class="comm"><div class="ic">${i+1}</div><div><h4>${fill(esc(it.h))}</h4>${fill(it.html)}${it.todo?`<div class="todo">${esc(it.todo)}</div>`:''}</div></div>`).join('')}
+   <div class="coming"><div class="k">${esc(c.comingHeading)}</div><p>${nb(c.coming)}</p></div>
+   <div class="close"><div class="q">${esc(C.closing[0])}</div><div class="s">${esc(C.closing[1])}</div></div>`);
+  }
+ }
+ document.getElementById('out').innerHTML = pages.join('');
+ paginate();
+ document.querySelectorAll('#out a').forEach(a => { a.target = '_blank'; a.rel = 'noopener'; });
+ const miss = [];
+ const raw = document.getElementById('draft').value.trim();
+ if (raw){ if(!d.goal)miss.push('Your goal:'); if(!d.p1.length)miss.push('Phase One'); if(!d.steps.length)miss.push('Step 1.'); }
+ const w = document.getElementById('warn');
+ if (raw && goalFlag(d)) miss.push('__GOAL__');
+ if (raw && negFlag(d)) miss.push('__NEG__');
+ const goalMsg = miss.includes('__GOAL__') ? '<b>The goal needs numbers.</b> Add where they are starting and the target, for example: average blood sugar 160 to under 130, weight 182 to 150 lb, by June 2027. Fix it in the <b>Goal, with numbers</b> box below.' : '';
+ const negMsg = miss.includes('__NEG__') ? '<b>Keep the affirmation positive.</b> Use only the feelings they want, in the present tense, for example: \u201cIn 2027, I feel encouraged and motivated.\u201d Leave out words like stuck, discouraged, or not. Fix it in the <b>2027 affirmation</b> box below.' : '';
+ const rest = miss.filter(x => x !== '__GOAL__' && x !== '__NEG__');
+ w.className = 'warn' + (miss.length?' show':'');
+ w.innerHTML = [goalMsg, negMsg, rest.length ? 'Heads up: I could not find <b>'+rest.map(esc).join(', ')+'</b> in the draft. Check the headings match Heidi\u2019s format.' : ''].filter(Boolean).join('<br><br>');
+}
+
+const EXAMPLE = `Your goal: Bring my A1c from 7.8 to under 6.5 and my weight from 182 to 140 pounds by December 2027.
+Starting point: A1c 7.8, average blood sugar 165, weight 182 pounds.
+Affirmation: In 2027, I feel in control of my health, encouraged, and motivated.
+Your pace: You chose to walk this year: steady steps you can keep.
+
+Phase One: Investigation
+Start a 7-day baseline tomorrow morning:
+- Weigh in at the same time each day.
+- Log all food honestly in MyFitnessPal, including emotional eating episodes.
+- Check your blood sugar by fingerstick every morning and evening, or wear a continuous glucose monitor if you can tolerate it. If the skin reaction becomes unbearable, remove it early and send a photo to the manufacturer for guidance.
+- At the end of the 7 days, weigh in again, download your MyFitnessPal PDF for the week, and submit the PDF, your before and after weights, and your blood sugar readings in the portal.
+
+Phase Two: The Work
+Step 1. Reduce carbohydrates and increase protein (protein above 100 g a day, carbohydrates below 100 g a day). This should support blood sugar balance. We are likely going to need to transform a way of eating you have had for 45 years, and I will help you. How long this step takes depends on how much time you have to give it. We do this first because going straight into a calorie deficit now could cost you muscle. Don't expect weight loss here. Expect better blood sugar numbers and maybe more energy.
+Step 2. Get into a calorie deficit. Expect weight loss here. Your baseline week tells us your maintenance calories, and then we will build the deficit from there. A deficit of about 500 calories a day usually yields about 1 pound a week. How long depends on consistency. Emotional eating could be an obstacle here, and we can work through it together.
+Step 3. Bring your fiber up while weight loss is happening. It will not slow weight loss, so we can work on it in the background. I will give you ideas based on what you are eating, and with a focused effort we can get your fiber where it needs to be in about a month. You should start to see more solid bowel movements.
+
+Phase Three: Maintenance
+Maintenance is a different skill entirely. How long you spend here depends on how your habits change through Phases One and Two. I will reassess when we get close, and we will build a clear order of operations for this phase together.
+
+Along the way, we will monitor your weight, blood sugar, and labs, and adjust for any obstacles that come up.
+
+Your 14-Day Reset: Starts January 5 and ends January 18. Protein target 100 g a day. Your changes: Greek yogurt and eggs stay in. Supplements: multivitamin with breakfast, probiotic at bedtime.
+When things get hard: I feel in control of my health, encouraged, and motivated.
+Before your next visit:
+- Get your A1c and lipid panel through your referring doctor before January 20.
+- Pick your reset start day and do your grocery shopping the weekend before.
+Your next visit: January 20. We start your plan.`;
+
+['packet','pname','rd','start','here','draft','supother'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+document.getElementById('sup').addEventListener('change', render);
+Object.keys(FIELDS).forEach(id => document.getElementById(id).addEventListener('input', e => { e.target.dataset.edited = e.target.value.trim() ? '1' : ''; render(); }));
+document.getElementById('out').addEventListener('click', e => { const q = e.target.closest('.quote.flag'); if (!q) return;
+ const el = document.getElementById(q.classList.contains('sage') ? 'aff' : 'goal'); el.scrollIntoView({behavior:'smooth', block:'center'}); el.focus(); el.select(); });
+document.getElementById('dl').onclick = () => { const n=v('pname'); const old=document.title; document.title = 'My 2027 Plan' + (n?' - '+n:''); window.print(); setTimeout(()=>document.title=old, 500); };
+/* two-click confirm, no pop-up dialogs */
+function twoClick(id, label, ask, needsAsk, act){
+ const b = document.getElementById(id); let armed = false, t;
+ b.onclick = () => {
+  if (needsAsk() && !armed){ armed = true; b.textContent = ask; clearTimeout(t); t = setTimeout(()=>{armed=false; b.textContent=label;}, 4000); return; }
+  armed = false; clearTimeout(t); b.textContent = label; act();
+ };
+}
+twoClick('clear','Clear','Click again to clear', () => true, () => {
+ ['pname','rd','start','draft','supother'].forEach(id=>document.getElementById(id).value=''); document.querySelectorAll('#sup input[type=checkbox]').forEach(x=>x.checked=false); resetFields(); document.getElementById('here').value='1'; render(); });
+twoClick('ex','Load example','Replace your text?', () => v('draft') !== '' && v('draft') !== EXAMPLE.trim(), () => {
+ const set = (id,val) => { const el=document.getElementById(id); if(!el.value.trim()) el.value=val; };
+ set('pname','Sample'); set('rd','Your RD'); set('start','January 20, 2027');
+ document.getElementById('draft').value = EXAMPLE; resetFields(); render();
+ document.getElementById('out').scrollIntoView({behavior:'smooth', block:'start'}); });
+/* scale the letter-size preview to fit beside the sidebar */
+const fit = () => { const m=document.querySelector('.main'), p=document.getElementById('out'); if(!m||!p) return;
+ const avail = m.clientWidth - 40, full = 816; p.style.zoom = window.innerWidth > 760 ? Math.min(1, avail/full) : Math.min(1, (window.innerWidth-24)/full); };
+window.addEventListener('resize', fit);
+window.addEventListener('beforeprint', () => { document.getElementById('out').style.zoom = 1; render(); });
+window.addEventListener('afterprint', () => { render(); fit(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
+
+render(); fit();
+</script>
+</body>
+</html>

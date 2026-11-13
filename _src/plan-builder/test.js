@@ -1,0 +1,10 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1500,height:1000}});
+const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
+await p.goto('file://'+process.cwd()+'/sdg-plan-builder.html');
+await p.click('#ex');await p.waitForTimeout(400);
+await p.screenshot({path:'ui.png'});
+console.log('warn:',await p.$eval('#warn',e=>e.className+' '+e.textContent));
+await p.emulateMedia({media:'print'});
+await p.pdf({path:'sample.pdf',preferCSSPageSize:true,printBackground:true});
+console.log('errors',errs);await b.close();})();
