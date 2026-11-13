@@ -27,6 +27,9 @@ label{display:block;font-family:JS;font-weight:600;font-size:11px;letter-spacing
 input,select,textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);border:1px solid #d7ccc6;border-radius:7px;padding:9px 10px;background:#fff}
 textarea{min-height:340px;resize:vertical;font-size:13px;line-height:1.45}
 textarea.small{min-height:0}
+.sup{display:grid;gap:6px}
+label.ck{font-family:MU,Arial,sans-serif;font-weight:400;font-size:13.5px;letter-spacing:0;text-transform:none;color:var(--ink);margin:0;display:flex;gap:8px;align-items:center;cursor:pointer}
+label.ck input{width:auto;accent-color:#964527}
 .needs{border-color:#c0392b!important;box-shadow:0 0 0 2px rgba(192,57,43,.15)}
 .quote.flag{cursor:pointer}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--peach);border-color:var(--peach)}
@@ -173,6 +176,16 @@ h3.t{font-family:CG;font-weight:600;font-size:16pt;color:var(--rust);margin:14pt
   <label for="aff">2027 affirmation, positive words only</label>
   <textarea id="aff" class="small" rows="2" placeholder="e.g. In 2027, I feel encouraged and motivated."></textarea>
   <p class="hint">These fill in from Heidi's draft. Fix them here; your edits win and the rest of the draft stays as is.</p>
+  <label>SDG support for this patient</label>
+  <div class="sup" id="sup">
+   <label class="ck"><input type="checkbox" value="SDG GLP-1 Program"> SDG GLP-1 Program</label>
+   <label class="ck"><input type="checkbox" value="Accountability Program"> Accountability Program</label>
+   <label class="ck"><input type="checkbox" value="Emotional Eating Class"> Emotional Eating Class</label>
+   <label class="ck"><input type="checkbox" value="Events and Connection"> Events and Connection</label>
+   <label class="ck"><input type="checkbox" value="Hormone services with Dr. Reker"> Hormone services with Dr. Reker</label>
+   <label class="ck"><input type="checkbox" value="Functional gut health consult with Taylor"> Functional gut health consult with Taylor</label>
+   <input id="supother" autocomplete="off" placeholder="Other (optional)">
+  </div>
 
   <div class="btns">
    <button class="primary" id="dl">Download PDF</button>
@@ -346,6 +359,9 @@ function render(){
    const todo = [...d.before, '__CS__'].map(x => x==='__CS__'
      ? `<li><b>Log in or sign up for your SDG Connection Space</b> at ${csLink}</li>` : `<li>${nb(x)}</li>`).join('');
    const cards = [`<div class="card"><div class="k">Steps to take before your next visit</div><ul class="dots checks">${todo}</ul></div>`];
+   const sup = [...document.querySelectorAll('#sup input[type=checkbox]:checked')].map(x => x.value);
+   if (v('supother')) sup.push(v('supother'));
+   if (sup.length) cards.push(`<div class="card"><div class="k">My SDG support</div><p>Your dietitian recommends adding these to your plan:</p><ul class="dots">${sup.map(x=>'<li><b>'+esc(x)+'</b></li>').join('')}</ul><p>Ask ${esc(v('rd')||'your dietitian')} in the portal or at your next visit to get started.</p></div>`);
    if (d.reset) cards.push(`<div class="card reset"><div class="k">My 14-Day Reset</div><p>${nb(d.reset)}</p><p>Your reset guide, tracker, meal plans, and recipes are in your <a href="${C.connect.resources}">2027 Goal Planning and 14-Day Reset Resources</a> inside your SDG Connection Space. New to Connection Space? <a href="${C.connect.url}"><b>Click here to LOG IN or SIGN UP</b></a> at ${csLink}.</p></div>`);
    cards.push(`<div class="card"><div class="k">My next appointment</div><p>${d.next?nb(d.next):esc(start||'To be scheduled')}</p></div>`);
    page(`<div class="eye">Keep this page handy</div><h2 class="t">Next steps</h2>${cards.join('')}`);
@@ -423,7 +439,8 @@ Before your next visit:
 - Pick your reset start day and do your grocery shopping the weekend before.
 Your next visit: January 20. We start your plan.`;
 
-['packet','pname','rd','start','here','draft'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+['packet','pname','rd','start','here','draft','supother'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+document.getElementById('sup').addEventListener('change', render);
 Object.keys(FIELDS).forEach(id => document.getElementById(id).addEventListener('input', e => { e.target.dataset.edited = e.target.value.trim() ? '1' : ''; render(); }));
 document.getElementById('out').addEventListener('click', e => { const q = e.target.closest('.quote.flag'); if (!q) return;
  const el = document.getElementById(q.classList.contains('sage') ? 'aff' : 'goal'); el.scrollIntoView({behavior:'smooth', block:'center'}); el.focus(); el.select(); });
@@ -437,7 +454,7 @@ function twoClick(id, label, ask, needsAsk, act){
  };
 }
 twoClick('clear','Clear','Click again to clear', () => true, () => {
- ['pname','rd','start','draft'].forEach(id=>document.getElementById(id).value=''); resetFields(); document.getElementById('here').value='1'; render(); });
+ ['pname','rd','start','draft','supother'].forEach(id=>document.getElementById(id).value=''); document.querySelectorAll('#sup input[type=checkbox]').forEach(x=>x.checked=false); resetFields(); document.getElementById('here').value='1'; render(); });
 twoClick('ex','Load example','Replace your text?', () => v('draft') !== '' && v('draft') !== EXAMPLE.trim(), () => {
  const set = (id,val) => { const el=document.getElementById(id); if(!el.value.trim()) el.value=val; };
  set('pname','Sample'); set('rd','Your RD'); set('start','January 20, 2027');
