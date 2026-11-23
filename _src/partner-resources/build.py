@@ -46,7 +46,7 @@ PARTNERS = {
             ("Ahwatukee Foothills", "https://alloypersonaltraining.com/location/ahwatukee-foothills-az/"),
         ],
         "back_title": "Train with Alloy",
-        "back_text": "SDG patients receive two weeks of training at Alloy, six sessions in all. Choose your location to get started.",
+        "back_text": "SDG patients receive two complimentary weeks of training at Alloy, six sessions in all. Choose your location to get started.",
     },
     "rise": {
         "name": "RISE Modern Wellness",
