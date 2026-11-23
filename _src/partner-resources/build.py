@@ -16,7 +16,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 # Paste the JotForm link here once the "Request a resource" form exists.
 REQUEST_FORM_URL = "https://form.jotform.com/SouthwestDietitianGroup/request-a-resource"
-BENEFITS_FORM_URL = "https://form.jotform.com/SouthwestDietitianGroup/verify-my-benefits"
+CONSULT_URL = "https://sdg.intakeq.com/booking?serviceId=68c0e8e5-5097-4298-bee4-f5482008c1e0"
 
 RESOURCES = [
     {
@@ -46,7 +46,7 @@ PARTNERS = {
             ("Ahwatukee Foothills", "https://alloypersonaltraining.com/location/ahwatukee-foothills-az/"),
         ],
         "back_title": "Train with Alloy",
-        "back_text": "Good nutrition works best with a coach in your corner. Book your next session at your Alloy location.",
+        "back_text": "SDG patients receive two weeks of training at Alloy, six sessions in all. Choose your location to get started.",
     },
     "rise": {
         "name": "RISE Modern Wellness",
@@ -57,7 +57,7 @@ PARTNERS = {
             ("Chandler", "https://risemodernwellness.com/locations/chandler-arizona/"),
         ],
         "back_title": "Recover and recharge at RISE",
-        "back_text": "Pair what you eat with how you recover. Book your next visit at RISE Modern Wellness in Chandler.",
+        "back_text": "SDG patients receive six complimentary wellness sessions over two weeks at RISE Modern Wellness in Chandler, to support recovery, reduce inflammation and improve energy.",
     },
 }
 
@@ -95,7 +95,7 @@ def page(slug, p):
     return TEMPLATE.format(
         name=e(p["name"]), short=e(p["short"]), logo=p["logo"], logo_w=p["logo_w"],
         cards=cards, locs=locs, back_title=e(p["back_title"]), back_text=e(p["back_text"]),
-        request=REQUEST_FORM_URL, benefits=BENEFITS_FORM_URL, count=len(res),
+        request=REQUEST_FORM_URL, consult=CONSULT_URL, count=len(res),
     )
 
 
@@ -106,9 +106,9 @@ TEMPLATE = """<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Nutrition resources for {name} members | Southwest Dietitian Group</title>
 <meta name="robots" content="noindex">
-<meta name="description" content="Free nutrition handouts for {name} members from the registered dietitians at Southwest Dietitian Group.">
+<meta name="description" content="Complimentary nutrition handouts for {name} members from the registered dietitians at Southwest Dietitian Group.">
 <meta property="og:title" content="Nutrition resources for {name} members">
-<meta property="og:description" content="Free handouts from the registered dietitians at Southwest Dietitian Group.">
+<meta property="og:description" content="Complimentary handouts from the registered dietitians at Southwest Dietitian Group.">
 <meta property="og:image" content="https://go.southwestdietitiangroup.com/assets/sdg-badge.png">
 <link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon-64.png?v=2">
 <link rel="apple-touch-icon" href="/assets/favicon-180.png?v=2">
@@ -128,7 +128,7 @@ TEMPLATE = """<!doctype html>
       </div>
       <p class="eyebrow">For {name} members</p>
       <h1>Nutrition resources from your dietitians</h1>
-      <p class="lede">Free handouts from the registered dietitians at Southwest Dietitian Group, made to support your training. Download them, print them or save them to your phone.</p>
+      <p class="lede">Complimentary handouts from the registered dietitians at Southwest Dietitian Group, made to support your training. Download them, print them or save them to your phone.</p>
       <div class="hero-actions">
         <a class="btn btn-peach" href="#resources">See the handouts</a>
         <a class="btn btn-ghost" href="{request}" target="_blank" rel="noopener">Request a topic</a>
@@ -159,15 +159,15 @@ TEMPLATE = """<!doctype html>
       </div>
     </section>
 
-    <section class="band" id="dietitian">
+    <section class="band" id="consult">
       <div class="wrap split">
         <div>
-          <p class="eyebrow">One on one</p>
-          <h2>Want a plan built around you?</h2>
+          <p class="eyebrow">For {short} members</p>
+          <h2>Your complimentary nutrition consult</h2>
         </div>
         <div class="split-body">
-          <p class="lede">Our registered dietitians work with insurance, and most patients pay $0. Telehealth and in-person visits in Arizona and Oregon.</p>
-          <a class="btn btn-rust" href="{benefits}" target="_blank" rel="noopener">Check my benefits</a>
+          <p class="lede">Book a 30-minute nutrition consult with Maya Nahra, RD, LD, owner of Southwest Dietitian Group and a registered dietitian for 18 years. It's on us.</p>
+          <a class="btn btn-rust" href="{consult}" target="_blank" rel="noopener">Book my consult</a>
         </div>
       </div>
     </section>
