@@ -11,3 +11,6 @@ Build sources for SDG pages and PDFs. Nothing here contains patient information.
 - `rd-training-pdf/` builds the branded PDF of the RD Session Guide from a markdown export.
 
 Fonts are the @fontsource packages (Cormorant Garamond, Josefin Sans, Mulish); update the font paths in each build script to wherever they are installed.
+- `partner-resources/` builds the partner resource pages `/alloy/` and `/rise/` (handouts for partner gym members).
+  - PDFs live in `/resources/files/`, page-1 thumbnails in `/resources/img/`, shared styles in `/resources/partner.css`.
+  - Add a handout or partner in `build.py`, then run `python3 _src/partner-resources/build.py`. Instructions are at the top of the script.
