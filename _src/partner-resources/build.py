@@ -59,6 +59,25 @@ PARTNERS = {
         "back_title": "Recover and recharge at RISE",
         "back_text": "SDG patients receive six complimentary wellness sessions over two weeks at RISE Modern Wellness in Chandler, to support recovery, reduce inflammation and improve energy.",
     },
+    "unify": {
+        "name": "Unify Health and Wellness",
+        "short": "Unify",
+        "logo": "/resources/img/unify-logo.png",
+        "logo_w": 200,
+        "locations": [],
+        "buttons": [
+            ("Call 602-644-1563", "tel:+16026441563"),
+            ("Email Unify", "mailto:connectwithus@unifyaz.com"),
+            ("Visit unifyaz.com", "https://unifyaz.com/"),
+        ],
+        "back_title": "Train with Unify",
+        "back_text": "SDG patients receive a Complimentary Strength Strategy Session plus three complimentary Small Group Personal Training sessions.",
+        "back_more": [
+            "Start with a complimentary 15-minute Strength Strategy Session with Shauna to discuss your goals, training history, injuries or limitations, and determine the best path forward.",
+            "Then experience Unify for yourself with three complimentary Small Group Personal Training sessions, designed to help you build strength, move better and train with confidence.",
+            "No pressure. Just a clear starting point and the opportunity to experience how Unify trains.",
+        ],
+    },
 }
 
 e = html.escape
@@ -88,13 +107,17 @@ def card(r):
 def page(slug, p):
     res = [r for r in RESOURCES if slug in r.get("partners", PARTNERS)]
     cards = "".join(card(r) for r in res)
+    buttons = p.get("buttons") or [(f'{p["short"]} {n}', u) for n, u in p["locations"]]
     locs = "".join(
-        f'<a class="btn btn-peach" href="{u}" target="_blank" rel="noopener">{e(p["short"])} {e(n)}</a>'
-        for n, u in p["locations"]
+        f'<a class="btn btn-peach" href="{u}"'
+        + ('' if u.startswith(("tel:", "mailto:")) else ' target="_blank" rel="noopener"')
+        + f'>{e(lbl)}</a>'
+        for lbl, u in buttons
     )
+    back = "".join(f'<p class="lede">{e(t)}</p>' for t in ([p["back_text"]] + p.get("back_more", [])))
     return TEMPLATE.format(
         name=e(p["name"]), short=e(p["short"]), logo=p["logo"], logo_w=p["logo_w"],
-        cards=cards, locs=locs, back_title=e(p["back_title"]), back_text=e(p["back_text"]),
+        cards=cards, locs=locs, back_title=e(p["back_title"]), back=back,
         request=REQUEST_FORM_URL, consult=CONSULT_URL, count=len(res),
     )
 
@@ -166,7 +189,7 @@ TEMPLATE = """<!doctype html>
           <h2>Your complimentary nutrition consult</h2>
         </div>
         <div class="split-body">
-          <p class="lede">Book a 30-minute nutrition consult with Maya Nahra, RD, LD, owner of Southwest Dietitian Group and a registered dietitian for 18 years. It's on us.</p>
+          <p class="lede">Book a 30-minute nutrition consult with Maya Nahra, RD, LD, owner of Southwest Dietitian Group and a registered dietitian for 18 years.</p>
           <a class="btn btn-rust" href="{consult}" target="_blank" rel="noopener">Book my consult</a>
         </div>
       </div>
@@ -176,7 +199,7 @@ TEMPLATE = """<!doctype html>
       <div class="wrap center">
         <img class="partner-logo" src="{logo}" alt="{name}" style="width:{logo_w}px">
         <h2>{back_title}</h2>
-        <p class="lede">{back_text}</p>
+        <div class="back-copy">{back}</div>
         <div class="hero-actions">{locs}</div>
       </div>
     </section>

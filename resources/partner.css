@@ -86,3 +86,5 @@ body { margin: 0; background: #F4F4F4; }
   .sdg-lp .cobrand .partner-logo { max-width: 46vw; }
   .sdg-lp .cobrand .sdg-logo { width: 120px; }
 }
+.sdg-lp .back-copy { display: grid; gap: 14px; justify-items: center; }
+.sdg-lp .back-copy .lede:first-child { color: var(--paper); font-weight: 600; }
