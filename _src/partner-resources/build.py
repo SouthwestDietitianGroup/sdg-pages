@@ -15,7 +15,7 @@ import html, pathlib
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 # Paste the JotForm link here once the "Request a resource" form exists.
-REQUEST_FORM_URL = "https://form.jotform.com/SouthwestDietitianGroup/request-a-resource"
+REQUEST_FORM_URL = "https://form.jotform.com/263257167018055"
 CONSULT_URL = "https://sdg.intakeq.com/booking?serviceId=68c0e8e5-5097-4298-bee4-f5482008c1e0"
 
 RESOURCES = [
